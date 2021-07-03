@@ -37,7 +37,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.setContent('test 123');
       editor.execCommand('SelectAll');
       editor.execCommand('Bold');
-      TinyAssertions.assertContent(editor, '<p><strong>test 123</strong></p>');
+      TinyAssertions.assertContent(editor, '<p><strong>test 12</strong></p>');
 
       editor.setContent('test 123');
       editor.execCommand('SelectAll');
@@ -298,6 +298,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.execCommand('SelectAll');
       editor.execCommand('mceInsertLink', false, 'test');
       TinyAssertions.assertContent(editor, '<p><a href="test">test 123</a></p>');
+      // Assert that the selection goes from the inner "test" all the way to the end.
+      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
     });
 
     it('mceInsertLink (link absolute)', () => {
@@ -306,6 +308,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.execCommand('SelectAll');
       editor.execCommand('mceInsertLink', false, 'http://www.site.com');
       TinyAssertions.assertContent(editor, '<p><a href="http://www.site.com">test 123</a></p>');
+      // Assert that the selection goes from the inner "test" all the way to the end.
+      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
     });
 
     it('mceInsertLink (link encoded)', () => {
@@ -338,6 +342,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.execCommand('SelectAll');
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link"><img style="float: right;" src="about:blank"></a></p>');
+      // Assert that the selection covers the whole string.
+      TinyAssertions.assertSelection(editor, [ ], 0, [ ], 1);
     });
 
     it('mceInsertLink (link adjacent text)', () => {
@@ -351,6 +357,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="#">a</a><a href="link">b</a></p>');
+      // Assert that the selection is just the "b</a>" part.
+      TinyAssertions.assertSelection(editor, [ 0, 1, 0 ], 0, [ 0, 1 ], 1);
     });
 
     it('mceInsertLink (link text inside text)', () => {
@@ -360,6 +368,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link"><em>abc</em></a></p>');
+      // Assert that the selection is just the "b".
+      TinyAssertions.assertSelection(editor, [ 0, 0, 0, 0 ], 1, [ 0, 0, 0, 0 ], 2);
     });
 
     it('mceInsertLink (link around existing links)', () => {
@@ -369,6 +379,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link">12</a></p>');
+      // Assert that the selection is from "12" to the end.
+      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
     });
 
     it('mceInsertLink (link around existing links with different attrs)', () => {
@@ -394,6 +406,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
         '<p><a href="link"><span id="s1"><strong><em>1</em>' +
         '</strong></span><span id="s2"><em><strong>2</strong></em></span></a></p>'
       );
+      // Assert that the selection goes from the 1 inside the first <em> all the way to the end.
+      TinyAssertions.assertSelection(editor, [ 0, 0, 0, 0, 0, 0 ], 0, [ ], 1);
     });
 
     it('mceInsertLink (link text inside link)', () => {
@@ -404,6 +418,8 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link">test</a></p>');
+      // Assert that the selection goes from "test" all the way to the end.
+      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
     });
 
     it('mceInsertLink bug #7331', () => {
