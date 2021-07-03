@@ -298,8 +298,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.execCommand('SelectAll');
       editor.execCommand('mceInsertLink', false, 'test');
       TinyAssertions.assertContent(editor, '<p><a href="test">test 123</a></p>');
-      // Assert that the selection goes from the inner "test" all the way to the end.
-      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
+      TinyAssertions.assertCursor(editor, [ ], 1); // Cursor should be at the end.
     });
 
     it('mceInsertLink (link absolute)', () => {
@@ -308,8 +307,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.execCommand('SelectAll');
       editor.execCommand('mceInsertLink', false, 'http://www.site.com');
       TinyAssertions.assertContent(editor, '<p><a href="http://www.site.com">test 123</a></p>');
-      // Assert that the selection goes from the inner "test" all the way to the end.
-      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
+      TinyAssertions.assertCursor(editor, [ ], 1); // Cursor should be at the end.
     });
 
     it('mceInsertLink (link encoded)', () => {
@@ -342,8 +340,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
       editor.execCommand('SelectAll');
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link"><img style="float: right;" src="about:blank"></a></p>');
-      // Assert that the selection covers the whole string.
-      TinyAssertions.assertSelection(editor, [ ], 0, [ ], 1);
+      TinyAssertions.assertCursor(editor, [ ], 1); // Cursor should be at the end.
     });
 
     it('mceInsertLink (link adjacent text)', () => {
@@ -357,19 +354,29 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="#">a</a><a href="link">b</a></p>');
-      // Assert that the selection is just the "b</a>" part.
-      TinyAssertions.assertSelection(editor, [ 0, 1, 0 ], 0, [ 0, 1 ], 1);
+      TinyAssertions.assertCursor(editor, [ 0 ], 2); // Cursor should be at the end.
     });
 
     it('mceInsertLink (link text inside text)', () => {
       const editor = hook.editor();
       editor.setContent('<p><a href="#"><em>abc</em></a></p>');
-      LegacyUnit.setSelection(editor, 'em', 1, 'em', 2);
+      LegacyUnit.setSelection(editor, 'em', 1, 'em', 2); // Select `b`
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link"><em>abc</em></a></p>');
-      // Assert that the selection is just the "b".
-      TinyAssertions.assertSelection(editor, [ 0, 0, 0, 0 ], 1, [ 0, 0, 0, 0 ], 2);
+      TinyAssertions.assertCursor(editor, [ 0, 0 ], 1); // Cursor should be between </a> and </p>.
+    });
+
+    it('mceInsertLink (link text inside text then type)', () => {
+      const editor = hook.editor();
+      editor.setContent('<p><a href="#"><em>abc</em></a></p>');
+      LegacyUnit.setSelection(editor, 'em', 1, 'em', 2); // Select `b`
+
+      editor.execCommand('mceInsertLink', false, 'link');
+      editor.insertContent('d');
+      // Note that the `d` is inserted *behind* the newly inserted link.
+      TinyAssertions.assertContent(editor, '<p><em>a<a href="link">b</a>dc</em></p>');
+      TinyAssertions.assertCursor(editor, [ 0, 0, 2 ], 1); // Cursor should be between d and c.
     });
 
     it('mceInsertLink (link around existing links)', () => {
@@ -379,8 +386,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link">12</a></p>');
-      // Assert that the selection is from "12" to the end.
-      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
+      TinyAssertions.assertCursor(editor, [ ], 1); // Cursor should be at the end.
     });
 
     it('mceInsertLink (link around existing links with different attrs)', () => {
@@ -406,8 +412,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
         '<p><a href="link"><span id="s1"><strong><em>1</em>' +
         '</strong></span><span id="s2"><em><strong>2</strong></em></span></a></p>'
       );
-      // Assert that the selection goes from the 1 inside the first <em> all the way to the end.
-      TinyAssertions.assertSelection(editor, [ 0, 0, 0, 0, 0, 0 ], 0, [ ], 1);
+      TinyAssertions.assertCursor(editor, [ ], 1); // Cursor should be at the end.
     });
 
     it('mceInsertLink (link text inside link)', () => {
@@ -418,8 +423,7 @@ describe('browser.tinymce.core.FormattingCommandsTest', () => {
 
       editor.execCommand('mceInsertLink', false, 'link');
       TinyAssertions.assertContent(editor, '<p><a href="link">test</a></p>');
-      // Assert that the selection goes from "test" all the way to the end.
-      TinyAssertions.assertSelection(editor, [ 0, 0, 0 ], 0, [ ], 1);
+      TinyAssertions.assertCursor(editor, [ ], 1); // Cursor should be at the end.
     });
 
     it('mceInsertLink bug #7331', () => {

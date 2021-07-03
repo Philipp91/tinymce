@@ -24,6 +24,9 @@ export const registerCommands = (editor: Editor): void => {
       if (linkDetails.href) {
         editor.formatter.apply('link', linkDetails, anchor);
       }
+
+      // Move the cursor behind the new link, so the user can go on typing.
+      editor.selection.setStart(editor.selection.getEnd());
     }
   };
 

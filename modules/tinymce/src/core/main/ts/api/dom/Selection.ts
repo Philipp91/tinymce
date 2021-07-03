@@ -78,6 +78,7 @@ interface EditorSelection {
   setRng: (rng: Range, forward?: boolean) => void;
   getRng: () => Range;
   getStart: (real?: boolean) => Element;
+  setStart: (elm: Element) => void;
   getEnd: (real?: boolean) => Element;
   getSelectedBlocks: (startElm?: Element, endElm?: Element) => Element[];
   normalize: () => Range;
@@ -175,6 +176,18 @@ const EditorSelection = (dom: DOMUtils, win: Window, serializer: DomSerializer, 
    * @return {Element} Start element of selection range.
    */
   const getStart = (real?: boolean): Element => ElementSelection.getStart(editor.getBody(), getRng(), real);
+
+  /**
+   * Changes the selection to start behind the given element.
+   *
+   * @method setStart
+   * @param {Element} elm Start element of selection range.
+   */
+  const setStart = (elm: Element): void => {
+    const rng = dom.createRng();
+    rng.setStartAfter(elm);
+    setRng(rng);
+  };
 
   /**
    * Returns the end element of a selection range. If the end is in a text
@@ -598,6 +611,7 @@ const EditorSelection = (dom: DOMUtils, win: Window, serializer: DomSerializer, 
     setRng,
     getRng,
     getStart,
+    setStart,
     getEnd,
     getSelectedBlocks,
     normalize,
