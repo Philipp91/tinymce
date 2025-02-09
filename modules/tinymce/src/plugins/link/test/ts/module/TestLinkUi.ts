@@ -57,7 +57,7 @@ const assertDialogContents = (expected: Record<string, any>): void => {
 
 const pInsertLink = async (editor: Editor, url: string): Promise<void> => {
   await pOpenLinkDialog(editor);
-  FocusTools.setActiveValue(doc, url);
+  FocusTools.setActiveValue(doc, url, 'change');
   await pClickSave(editor);
 };
 
